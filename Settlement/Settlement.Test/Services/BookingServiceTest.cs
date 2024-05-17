@@ -30,10 +30,58 @@ public class BookingServiceTest
         _bookingService = new BookingService(_dbContext, _options);
     }
 
+    [Fact]
+    public async Task CreateBooking_ShouldBeAbleToBookUntil1HourBeforeClosingTime()
+    {
+        var bookingTime = _businessTimeTo.AddHours(-1);
+
+        try
+        {
+            await _bookingService.CreateBooking(new Booking
+            {
+                BookingTime = bookingTime,
+                Name = "Test"
+            });
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail($"Unexpected exception: {ex.Message}");
+        }
+
+        ClearDatabase();
+    }
+
+    [Fact]
+    public async Task CreateBooking_ShouldNotBeAbleToBook59MinutesBeforeClosingTime()
+    {
+        var bookingTime = _businessTimeTo.AddMinutes(-59);
+
+        try
+        {
+            await _bookingService.CreateBooking(new Booking
+            {
+                BookingTime = bookingTime,
+                Name = "Test"
+            });
+
+            Assert.Fail("Expected exception was not thrown");
+        }
+        catch (BookingBusinessHoursException ex)
+        {
+            Assert.Equal("Booking time is outside business hours", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail($"Unexpected exception: {ex.Message}");
+        }
+
+        ClearDatabase();
+    }
+
     [Theory]
     [InlineData("9:00", "9:00", "9:00", "9:00", "9:00")]
     [InlineData("9:00", "9:25", "9:45", "9:59", "9:33")]
-    public async Task CreateSettlement_ThrowsSettlementConflictException(params string[] hours)
+    public async Task CreateBooking_ThrowsBookingConflictException(params string[] hours)
     {
         var timeOnlyHours = hours.Select(x => TimeOnly.Parse(x)).ToList();
 
@@ -62,11 +110,10 @@ public class BookingServiceTest
         ClearDatabase();
     }
 
-    // multiple examples not throwing exception
     [Theory]
     [InlineData("9:00", "9:00", "9:00", "9:00", "10:00")]
     [InlineData("9:15", "9:30", "9:45", "10:00", "10:15")]
-    public async Task CreateSettlement_ShouldNotThrowSettlementConflictException(params string[] hours)
+    public async Task CreateBooking_ShouldNotThrowBookingConflictException(params string[] hours)
     {
         var timeOnlyHours = hours.Select(x => TimeOnly.Parse(x)).ToList();
         
@@ -94,7 +141,7 @@ public class BookingServiceTest
     [InlineData("Sam", "17:01")]
     [InlineData("Miguel", "16:01")]
     [InlineData("Juan", "00:00")]
-    public async Task CreateSettlement_ThrowsSettlementBusinessHoursException(string name, string hour)
+    public async Task CreateBooking_ThrowsBookingBusinessHoursException(string name, string hour)
     {
         var timeOnlyHour = TimeOnly.Parse(hour);
 

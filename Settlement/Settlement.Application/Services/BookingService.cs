@@ -42,10 +42,25 @@ public class BookingService(SettlementDBContext dbContext, IOptions<BookingServi
         return Task.FromResult(settlement);
     }
 
+    public Task DeleteBooking(Guid id)
+    {
+        var booking = _dbContext.Bookings.SingleOrDefault(x => x.Id == id);
+
+        if (booking == null)
+        {
+            throw new BookingNotFoundException();
+        }
+
+        _dbContext.Remove(booking);
+        _dbContext.SaveChangesAsync();
+
+        return Task.CompletedTask;
+    }
+
     private void CheckConflict(TimeOnly bookingTime)
     {
         TimeOnly bookingEndTime = bookingTime.AddHours(1);
-        var isConflict = _dbContext.Bookings
+        var isConflict = _dbContext.Bookings.AsNoTracking()
             .Where(s =>
                 bookingTime >= s.BookingTime && bookingTime < s.BookingTime.AddHours(1) ||
                 bookingEndTime > s.BookingTime && bookingEndTime <= s.BookingTime.AddHours(1) ||
@@ -64,20 +79,5 @@ public class BookingService(SettlementDBContext dbContext, IOptions<BookingServi
         {
             throw new BookingBusinessHoursException();
         }
-    }
-
-    public Task DeleteBooking(Guid id)
-    {
-        var booking = _dbContext.Bookings.SingleOrDefault(x => x.Id == id);
-
-        if (booking == null)
-        {
-            throw new BookingNotFoundException();
-        }
-
-        _dbContext.Remove(booking);
-        _dbContext.SaveChangesAsync();
-
-        return Task.CompletedTask;
     }
 }

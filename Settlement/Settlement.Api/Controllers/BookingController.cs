@@ -42,21 +42,16 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<BookingViewModel>> CreateBooking(BookingViewModel booking)
+    public async Task<IActionResult> CreateBooking(BookingViewModel booking)
     {
         try {
             var createdBooking = await _bookingService.CreateBooking(new Booking
             {
                 Name = booking.Name,
-                BookingTime = booking.BookingTime
+                BookingTime = new TimeOnly(booking.BookingTime.Hour, booking.BookingTime.Minute, 0) // TODO: Fix this
             });
 
-            return Ok(new BookingViewModel
-            {
-                BookingId = createdBooking.Id,
-                Name = createdBooking.Name,
-                BookingTime = createdBooking.BookingTime
-            });
+            return Ok(new { BookingId = createdBooking.Id });
         } catch (BookingConflictException)
         {
             return BadRequest("Booking time conflict");
@@ -69,7 +64,14 @@ public class BookingController(IBookingService bookingService) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteBooking(Guid id)
     {
+        try
+        {
             await _bookingService.DeleteBooking(id);
-            return NoContent();
+        } catch (BookingNotFoundException)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
     }   
 }

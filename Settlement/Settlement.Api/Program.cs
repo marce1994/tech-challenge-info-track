@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDateOnlyTimeOnlyStringConverters();
 builder.Services.AddSwaggerGen(c => c.UseDateOnlyTimeOnlyStringConverters());
 builder.Services.AddControllers();
+
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<BookingViewModel>, BookingViewModelValidator>();
 builder.Services.Configure<BookingServiceOptions>(builder.Configuration.GetSection(BookingServiceOptions.BookingService));
