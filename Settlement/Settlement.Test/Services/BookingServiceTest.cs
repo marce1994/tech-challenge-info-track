@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Settlement.Application.Config;
 using Settlement.Application.Exceptions;
+using Settlement.Application.Models;
 using Settlement.Application.Services;
 
 namespace Settlement.Test.Services;
