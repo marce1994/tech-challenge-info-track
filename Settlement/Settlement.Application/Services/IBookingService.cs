@@ -1,3 +1,5 @@
+using Settlement.Application.Models;
+
 namespace Settlement.Application.Services;
 
 public interface IBookingService

@@ -1,8 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Settlement.Application.Services;
-using Microsoft.Extensions.Configuration;
-using Settlement.Application.Config;
 using Microsoft.EntityFrameworkCore;
+using Settlement.Application.Models;
 
 public static class DependencyInjection
 {

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Settlement.Application.Config;
 using Settlement.Application.Exceptions;
+using Settlement.Application.Models;
 
 namespace Settlement.Application.Services;
 

@@ -1,3 +1,5 @@
+namespace Settlement.Application.Models;
+
 public class Booking
 {
     public Guid Id { get; set; }

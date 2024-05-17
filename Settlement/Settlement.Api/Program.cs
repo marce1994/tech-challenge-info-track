@@ -13,6 +13,7 @@ builder.Services.AddSwaggerGen(c => c.UseDateOnlyTimeOnlyStringConverters());
 builder.Services.AddControllers();
 
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IValidator<BookingViewModel>, BookingViewModelValidator>();
 builder.Services.Configure<BookingServiceOptions>(builder.Configuration.GetSection(BookingServiceOptions.BookingService));
 
