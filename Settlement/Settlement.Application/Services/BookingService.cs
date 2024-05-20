@@ -13,14 +13,18 @@ public class BookingService(SettlementDBContext dbContext, IOptions<BookingServi
 
     public async Task<IEnumerable<Booking>> GetBookings()
     {
-        return await _dbContext.Bookings.AsNoTracking().ToListAsync();
+        return await _dbContext.Bookings
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task<Booking> GetBooking(Guid id)
     {
-        var booking = await _dbContext.Bookings.SingleOrDefaultAsync(x => x.Id == id);
+        var booking = await _dbContext.Bookings
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == id);
 
-        if (booking == null)
+        if (booking is null)
         {
             throw new BookingNotFoundException();
         }
@@ -46,7 +50,7 @@ public class BookingService(SettlementDBContext dbContext, IOptions<BookingServi
     {
         var booking = _dbContext.Bookings.SingleOrDefault(x => x.Id == id);
 
-        if (booking == null)
+        if (booking is null)
         {
             throw new BookingNotFoundException();
         }
@@ -60,14 +64,16 @@ public class BookingService(SettlementDBContext dbContext, IOptions<BookingServi
     private void CheckConflict(TimeOnly bookingTime)
     {
         TimeOnly bookingEndTime = bookingTime.AddHours(1);
-        var isConflict = _dbContext.Bookings.AsNoTracking()
+
+        var simultaneousBookings = dbContext.Bookings
+            .AsNoTracking()
             .Where(s =>
                 bookingTime >= s.BookingTime && bookingTime < s.BookingTime.AddHours(1) ||
                 bookingEndTime > s.BookingTime && bookingEndTime <= s.BookingTime.AddHours(1) ||
                 bookingTime <= s.BookingTime && bookingEndTime >= s.BookingTime.AddHours(1)
-            ).Count() >= _config.MaxSimultaneousSettlements;
+            );
 
-        if (isConflict)
+        if (simultaneousBookings.Count() >= _config.MaxSimultaneousSettlements)
         {
             throw new BookingConflictException();
         }

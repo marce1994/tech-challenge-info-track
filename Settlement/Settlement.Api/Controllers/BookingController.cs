@@ -15,7 +15,7 @@ public class BookingController(IBookingService bookingService, IMapper mapper) :
     private readonly IMapper _mapper = mapper;
 
     [HttpGet]
-    public async Task<ActionResult<BookingViewModel>> GetBookings()
+    public async Task<ActionResult<IEnumerable<BookingViewModel>>> GetBookings()
     {
         var bookings = await _bookingService.GetBookings();
         var bookingViewModels = _mapper.Map<IEnumerable<BookingViewModel>>(bookings);
@@ -25,23 +25,23 @@ public class BookingController(IBookingService bookingService, IMapper mapper) :
     [HttpGet("{id}")]
     public async Task<ActionResult<BookingViewModel>> GetBooking(Guid id)
     {
-        var booking = await _bookingService.GetBooking(id);
-        
-        if (booking == null)
+        try
+        {
+            var booking = await _bookingService.GetBooking(id);
+            return Ok(_mapper.Map<BookingViewModel>(booking));
+        } catch (BookingNotFoundException)
         {
             return NotFound();
         }
-
-        return Ok(_mapper.Map<BookingViewModel>(booking));
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateBooking(BookingViewModel booking)
+    public async Task<ActionResult<BookingViewModel>> CreateBooking(BookingViewModel booking)
     {
         try {
             var createdBooking = await _bookingService.CreateBooking(_mapper.Map<Booking>(booking));
 
-            return Ok(new { BookingId = createdBooking.Id });
+            return Ok(_mapper.Map<BookingViewModel>(createdBooking));
         } catch (BookingConflictException)
         {
             return BadRequest("Booking time conflict");
