@@ -3,6 +3,8 @@ using Settlement.Application.Services;
 using Microsoft.EntityFrameworkCore;
 using Settlement.Application.Models;
 
+namespace Settlement.Application;
+
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)

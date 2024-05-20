@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace Settlement.Application.Exceptions;
+﻿namespace Settlement.Application.Exceptions;
 
 public class BookingNotFoundException : Exception
 {

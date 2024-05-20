@@ -65,7 +65,7 @@ public class BookingService(SettlementDBContext dbContext, IOptions<BookingServi
     {
         TimeOnly bookingEndTime = bookingTime.AddHours(1);
 
-        var simultaneousBookings = dbContext.Bookings
+        var simultaneousBookings = _dbContext.Bookings
             .AsNoTracking()
             .Where(s =>
                 bookingTime >= s.BookingTime && bookingTime < s.BookingTime.AddHours(1) ||

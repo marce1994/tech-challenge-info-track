@@ -1,6 +1,8 @@
 using FluentValidation;
 using Settlement.Api.ViewModels;
 
+namespace Settlement.Api.Validators;
+
 public class BookingViewModelValidator : AbstractValidator<BookingViewModel>
 {
     public BookingViewModelValidator()
